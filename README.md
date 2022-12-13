@@ -1,2 +1,3 @@
-# examples
-Connector Examples in multiple languages  
+# Kalypso Examples
+Connector examples in multiple languages for Kalypso
+
