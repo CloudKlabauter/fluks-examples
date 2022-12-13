@@ -1,0 +1,85 @@
+{
+    "$schema": "https://docs.kalypso.cloud/schemas/connector/draft-1/schema.json",
+    "Infos": {
+        "Version": "0.1.0",
+        "ConnectorName": "Tradesmen Example",
+        "ConnectorId": "ck.kalypso.examples.connectors.tradesmen",
+        "Description": "Example tradesmen service connector"
+    },
+    "HostInfo": {
+        "HostUri": "https://cbe.kalypso.cloud/"
+    },
+    "SecurityInfo": {
+        "Name": "x-ck-api-token"
+    },
+    "Triggers": {
+        "OrderCompleted": {
+            "Name": "OrderCompleted",
+            "ResultModelId": "OrderCompletedResult",
+            "Title": "Order completed",
+            "Description": "An order has been completed",
+            "SchemaName": "ck.kalypso.examples.connectors.tradesmen.ordercompleted",
+            "SchemaVersion": "1",
+            "TriggerEvaluationLocation": "Connector",
+            "PossibleFilters": {
+                "Static": {
+                    "ClientId": {
+                        "DataType": "string",
+                        "Required": false,
+                        "Description": "Client Id"
+                    }
+                }
+            }
+        }
+    },
+    "Lookups": {},
+    "Actions": {
+        "CreateOrder": {
+            "Name": "CreateOrder",
+            "Title": "Create a new order",
+            "Description": "Order request sent to the tradesmen service",
+            "ActionResultContentDefinitionName": "CreateOrderResponse",
+            "SchemaName": "ck.kalypso.examples.connectors.tradesmen.createorder",
+            "SchemaVersion": "1",
+            "Parameters": [
+                {
+                    "Name": "OrderText",
+                    "Description": "What needs to be done",
+                    "Type": "string",
+                    "Required": true
+                },
+                {
+                    "Name": "ClientAdress",
+                    "Description": "Client adress",
+                    "Type": "string",
+                    "Required": true
+                }
+            ]
+        }
+    },
+    "Credentials": {},
+    "ModelDefinitions": {
+        "CreateOrderResponse": {
+            "DataType": "object",
+            "Properties": {
+                "Id": {
+                    "DataType": "string",
+                    "Description": "Order Id"
+                }
+            }
+        },
+        "OrderCompletedResult": {
+            "DataType": "object",
+            "Properties": {
+                "ClientID": {
+                    "DataType": "string",
+                    "Description": "Client Id"
+                },
+                "Message": {
+                    "DataType": "string",
+                    "Description": "Additional Message"
+                }
+            }
+        }
+    }
+}

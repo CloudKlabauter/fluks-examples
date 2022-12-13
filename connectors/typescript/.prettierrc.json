@@ -1,0 +1,21 @@
+{
+    "tabWidth": 4,
+    "printWidth": 120,
+    "singleAttributePerLine": true,
+    "bracketSameLine": true,
+    "bracketSpacing": false,
+    "overrides": [
+        {
+            "files": "*.ts, *.tsx",
+            "options": {
+                "parser": "typescript"
+            }
+        },
+        {
+            "files": "*.graphql",
+            "options": {
+                "parser": "graphql"
+            }
+        }
+    ]
+}
