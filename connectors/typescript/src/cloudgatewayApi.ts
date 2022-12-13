@@ -1,5 +1,8 @@
 import {processRequest} from "./requests";
-import {IActionFailure, IActionReply, IMessage, IMessageResponse} from "./types/message";
+import {IActionReply, IActionFailure, ActionReply} from "./types/actionTypes";
+import {IMessage, IMessageResponse} from "./types/messageTypes";
+import {SubscriptionRegisterReply, SubscriptionUnregisterReply} from "./types/subscriptionTypes";
+import {ITriggerReply} from "./types/triggerTypes";
 
 export const getMessagesAll10Minutes = (callback: (msgs: IMessage[]) => void) => {
     var intr = setInterval(async () => {
@@ -11,8 +14,9 @@ export const getMessagesAll10Minutes = (callback: (msgs: IMessage[]) => void) =>
         });
 
         if (messageResponse.ok) {
-            const messageDate = (await messageResponse.json()) as IMessageResponse;
-            callback(messageDate.messages);
+            const messageData = (await messageResponse.json()) as IMessageResponse;
+            console.log(messageData);
+            callback(messageData.messages);
         } else {
             const {status, statusText} = messageResponse;
             clearInterval(intr);
@@ -50,7 +54,9 @@ export const acknolwedgeMessage = async (msgId: string): Promise<boolean> => {
     return ackMessageResponse.ok;
 };
 
-export const sendActionResponse = async (respMsg: IActionReply | IActionFailure): Promise<boolean> => {
+export const sendMessageReply = async (
+    respMsg: ActionReply | SubscriptionRegisterReply | SubscriptionUnregisterReply
+): Promise<boolean> => {
     const actionReplyResponse = await fetch(`${process.env.KALYPSO_CLOUD_GATEWAY_URL}/api/messages/reply`, {
         method: "POST",
         headers: {
@@ -62,8 +68,30 @@ export const sendActionResponse = async (respMsg: IActionReply | IActionFailure)
     });
 
     if (!actionReplyResponse.ok) {
-        console.error(`Error reply message with id '${respMsg.conversationId}': ${actionReplyResponse.statusText}`);
+        console.error(
+            `Error reply message for conversationId '${respMsg.conversationId}': ${actionReplyResponse.statusText}`
+        );
     }
 
     return actionReplyResponse.ok;
+};
+
+export const sendTriggerExecution = async (respMsg: ITriggerReply): Promise<boolean> => {
+    const triggerReplyResponse = await fetch(`${process.env.KALYPSO_CLOUD_GATEWAY_URL}/api/trigger`, {
+        method: "POST",
+        headers: {
+            Accept: "application/json, text/plain",
+            "Content-Type": "application/json;charset=UTF-8",
+            "X-API-Key": process.env.KALYPSO_API_KEY!,
+        },
+        body: JSON.stringify(respMsg),
+    });
+
+    if (!triggerReplyResponse.ok) {
+        console.error(
+            `Error reply trigger execution message for subscriptionId '${respMsg.subscriptionId}': ${triggerReplyResponse.statusText}`
+        );
+    }
+
+    return triggerReplyResponse.ok;
 };

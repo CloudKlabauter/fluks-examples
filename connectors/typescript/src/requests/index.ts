@@ -1,4 +1,4 @@
-import {IActionMessage, IMessage, ISubscriptionMessage, MESSAGE_TYPES} from "../types/message";
+import {IActionMessage, IMessage, IRegisterSubscriptionMessage, IUnregisterSubscriptionMessage, MESSAGE_TYPES} from "../types/messageTypes";
 import {processActionRequest} from "./actionRequest";
 import {processConnectorRegisterSubscriptionRequest} from "./connectorRegisterSubscriptionRequest";
 import {processConnectorUnregisterSubscriptionRequest} from "./connectorUnregisterSubscriptionRequest";
@@ -11,10 +11,10 @@ export const processRequest = async (msg: IMessage) => {
             await processActionRequest(msg as IActionMessage);
             break;
         case MESSAGE_TYPES.ConnectorRegisterSubscriptionRequest:
-            processConnectorRegisterSubscriptionRequest(msg as ISubscriptionMessage);
+            await processConnectorRegisterSubscriptionRequest(msg as IRegisterSubscriptionMessage);
             break;
         case MESSAGE_TYPES.ConnectorUnregisterSubscriptionRequest:
-            processConnectorUnregisterSubscriptionRequest(msg as ISubscriptionMessage);
+            await processConnectorUnregisterSubscriptionRequest(msg as IUnregisterSubscriptionMessage);
             break;
         default:
             console.log(`Unkown message type: ${msg.type}`);
