@@ -4,7 +4,7 @@ This connector is based on NodeJS, TypeScript and Express. It is an example of a
 
 ## File structure
 
-The connector is splitted in seperate folders:
+The connector is splitted in separate folders:
 
 - `requests` contains the RequestHandlers for Actions and Triggers registrations
 - `store` contains the InMemory Subscription Store to save and remove registered subscriptions

@@ -14,7 +14,7 @@ Kalypso is based on interfaces we refer to as connectors that allow anyone to be
 
 In the documentation, we have created a <a href="https://docs.kalypso.cloud/docs/partners/tutorial/" target="_blank">tutorial</a> which takes you through the creation process of a connector.
 
-In this repository you find implementations using this tutorial for connectors in the different languages.
+In this repository you find implementations using this tutorial for connectors in different languages.
 ## What we're building
 
 In the examples, we have created a connector for a tradesmen service platform which includes a trigger and an action. The trigger informs a workflow that an order has been completed. The action creates an order.
