@@ -12,7 +12,11 @@ The connector is splitted in separate folders:
 
 ## Running the connector
 
-To start the connector, run the following command:
+Create a `.env` file and copy the content of the `.env.example` file into it. Replace the value of the `KALYPSO_API_KEY` variable with your API key. 
+
+> If you do not have an API Key yet, please contact <a href="mailto:info@cloudklabauter.de">support</a>.
+
+### To start the connector, run the following command:
 
 ```bash
 yarn install
