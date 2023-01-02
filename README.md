@@ -7,17 +7,17 @@
 
 ## About 
 
-<a href="https://www.kalypso.cloud/" target="_blank">Kalypso</a> is a platform to design workflows for connecting and automating processes with a wide variety of applications and services, including those in the real estate industry. 
+<a href="https://www.kalypso.cloud/" target="_blank">Kalypso</a> is a platform to design workflows for connecting and automating processes by providing a wide variety of applications and services, including those of the real estate industry. 
 
-Kalypso is based on connectors that allow anyone to become part of the platform. The basis of a connector is a <a href="https://docs.kalypso.cloud/docs/partners/connector-definition" target="_blank">Definition</a> that describes the triggers and actions of a connector.
 
-In the documentation, there is a <a href="https://docs.kalypso.cloud/docs/partners/tutorial/" target="_blank">tutorial</a> that explains how to create a connector step by step.
+Kalypso is based on interfaces we refer to as connectors that allow anyone to become part of the platform. The base of a connector is made up of a <a href="https://docs.kalypso.cloud/docs/partners/connector-definition" target="_blank">definition</a> that describes the triggers and actions of a connector.
 
-In this repository there are implementations of the tutorial for connectors in the different languages.
+In the documentation, we have created a <a href="https://docs.kalypso.cloud/docs/partners/tutorial/" target="_blank">tutorial</a> which takes you through the creation process of a connector.
 
+In this repository you find implementations using this tutorial for connectors in the different languages.
 ## What we're building
 
-In the examples, we create a connector for a tradesmen service platform that includes a trigger and an action. The trigger informs a workflow that an order has been completed. The action creates an order.
+In the examples, we have created a connector for a tradesmen service platform which includes a trigger and an action. The trigger informs a workflow that an order has been completed. The action creates an order.
 
 ## Examples
 
