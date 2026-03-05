@@ -12,7 +12,7 @@ export const processConnectorUnregisterSubscriptionRequest = async (msg: IUnregi
     } as IUnregisterSubscriptionMessageBase;
 
     try {
-        console.log(`Trigger '${msg.trigger}' unregistered with subcription id '${msg.subscriptionId}'`);
+        console.log(`Trigger '${msg.trigger}' unregistered with subscription id '${msg.subscriptionId}'`);
 
         await removeSubscription(msg.subscriptionId);
 
