@@ -40,6 +40,8 @@ app.post("/order/complete", jsonParser, async (req, res) => {
         const subscriptions = await getSubscriptionsForFilter(triggerId, filter);
         if (subscriptions.length === 0) console.log("No subscriptions found.");
 
+        let failedDeliveries = 0;
+
         for (const subscription of subscriptions) {
             const triggerExecutionReply: ITriggerReply = {
                 type: "Trigger",
@@ -50,10 +52,16 @@ app.post("/order/complete", jsonParser, async (req, res) => {
                 binaryIds: [],
             };
 
-            await sendTriggerExecution(triggerExecutionReply);
+            const delivered = await sendTriggerExecution(triggerExecutionReply);
+            if (!delivered) failedDeliveries++;
         }
 
-        res.sendStatus(200);
+        if (failedDeliveries > 0) {
+            console.error(`Trigger delivery failed for ${failedDeliveries} of ${subscriptions.length} subscription(s).`);
+            res.sendStatus(502);
+        } else {
+            res.sendStatus(200);
+        }
     } catch (err) {
         console.error((err as Error).message);
         res.sendStatus(400);

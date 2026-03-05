@@ -3,7 +3,7 @@ import { saveSubscription } from "../store/subscriptionStore";
 import { IRegisterSubscriptionMessage } from "../types/messageTypes";
 import { IRegisterSubscriptionMessageBase } from "../types/subscriptionTypes";
 
-export const processConnectorRegisterSubscriptionRequest = async (msg: IRegisterSubscriptionMessage) => {
+export const processConnectorRegisterSubscriptionRequest = async (msg: IRegisterSubscriptionMessage): Promise<boolean> => {
     const subscriptionResponse = {
         conversationId: msg.conversationId,
         tenantId: msg.tenantId,
@@ -14,19 +14,19 @@ export const processConnectorRegisterSubscriptionRequest = async (msg: IRegister
     try {
         // Here should be your connector subscription logic
         console.log(
-            `Trigger '${msg.trigger}' registered with subcription id '${
+            `Trigger '${msg.trigger}' registered with subscription id '${
                 msg.subscriptionId
             }' with filters '${JSON.stringify(msg.staticFilter)}`
         );
 
         await saveSubscription(msg);
 
-        await sendMessageReply({
+        return await sendMessageReply({
             ...subscriptionResponse,
             type: "ConnectorRegisterSubscriptionReply",
         });
     } catch (err) {
-        await sendMessageReply({
+        return await sendMessageReply({
             ...subscriptionResponse,
             type: "ConnectorRegisterSubscriptionFailure",
             failureReason: (err as Error).message,

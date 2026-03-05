@@ -13,26 +13,37 @@ import { processConnectorUnregisterSubscriptionRequest } from "./connectorUnregi
 export const processRequest = async (msg: IMessage) => {
     console.log(`Process message: ${msg.type}`);
 
+    let handledOk = false;
+
     try {
         switch (msg.type) {
             case MESSAGE_TYPES.ActionRequest:
-                await processActionRequest(msg as IActionMessage);
+                handledOk = await processActionRequest(msg as IActionMessage);
                 break;
             case MESSAGE_TYPES.ConnectorRegisterSubscriptionRequest:
-                await processConnectorRegisterSubscriptionRequest(msg as IRegisterSubscriptionMessage);
+                handledOk = await processConnectorRegisterSubscriptionRequest(msg as IRegisterSubscriptionMessage);
                 break;
             case MESSAGE_TYPES.ConnectorUnregisterSubscriptionRequest:
-                await processConnectorUnregisterSubscriptionRequest(msg as IUnregisterSubscriptionMessage);
+                handledOk = await processConnectorUnregisterSubscriptionRequest(msg as IUnregisterSubscriptionMessage);
                 break;
             default:
-                console.log(`Unkown message type: ${msg.type}`);
+                console.log(`Unknown message type: ${msg.type}`);
+                handledOk = true;
                 break;
         }
-    } finally {
+    } catch (err) {
+        console.error(`Processing message failed: ${(err as Error).message}`);
+    }
+
+    if (handledOk) {
         // Acknowledging tells fluks this incoming message is now done on connector side.
         // From this point, completion responsibility is no longer with fluks.
         // If a connector does not acknowledge, fluks will redeliver the exact same message
         // repeatedly to guarantee the message is not lost.
-        await acknolwedgeMessage(msg.messageId);
+        try {
+            await acknolwedgeMessage(msg.messageId);
+        } catch (err) {
+            console.error(`Failed to acknowledge message ${msg.messageId}: ${(err as Error).message}`);
+        }
     }
 };
