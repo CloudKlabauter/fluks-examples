@@ -19,8 +19,8 @@ Create a `.env` file and copy the content of the `.env.example` file into it. Re
 ### To start the connector, run the following command:
 
 ```bash
-yarn install
-yarn dev
+npm install
+npm run dev
 ```
 
 The connector is running at <a href="<http://localhost:3000>" target="_blank">http://localhost:3000</a>.
