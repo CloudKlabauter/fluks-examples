@@ -1,6 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
-import { getMessagesAll10Minutes, processMessages, sendMessageReply, sendTriggerExecution } from "./cloudgatewayApi";
+import { getMessagesAll10Minutes, processMessages, sendTriggerExecution } from "./cloudgatewayApi";
 import { IMessageResponse } from "./types/messageTypes";
 import { ITriggerReply } from "./types/triggerTypes";
 import { IOrderCompletedResponse } from "./types/tradesmenTypes";
@@ -22,7 +22,7 @@ app.get("/notify", async (req, res) => {
 
     if (messageResponse.ok) {
         const messageDate = (await messageResponse.json()) as IMessageResponse;
-        processMessages(messageDate.messages);
+        await processMessages(messageDate.messages);
 
         res.sendStatus(200);
     } else {
@@ -37,24 +37,31 @@ app.post("/order/complete", jsonParser, async (req, res) => {
     try {
         const triggerId = "ck.fluks.examples.connectors.tradesmen.ordercompleted@1";
         const filter = req.body.filter;
-        getSubscriptionsForFilter(triggerId, filter, (subscriptions) => {
-            if (subscriptions.length === 0) console.log("No subscriptions found.");
+        const subscriptions = await getSubscriptionsForFilter(triggerId, filter);
+        if (subscriptions.length === 0) console.log("No subscriptions found.");
 
-            subscriptions.forEach(async (subscription) => {
-                const triggerExecutionReply: ITriggerReply = {
-                    type: "Trigger",
-                    subscriptionId: subscription.subscriptionId,
-                    tenantId: subscription.tenantId,
-                    trigger: subscription.trigger,
-                    payload: req.body.payload as IOrderCompletedResponse,
-                    binaryIds: [],
-                };
+        let failedDeliveries = 0;
 
-                await sendTriggerExecution(triggerExecutionReply);
-            });
-        });
+        for (const subscription of subscriptions) {
+            const triggerExecutionReply: ITriggerReply = {
+                type: "Trigger",
+                subscriptionId: subscription.subscriptionId,
+                tenantId: subscription.tenantId,
+                trigger: subscription.trigger,
+                payload: req.body.payload as IOrderCompletedResponse,
+                binaryIds: [],
+            };
 
-        res.sendStatus(200);
+            const delivered = await sendTriggerExecution(triggerExecutionReply);
+            if (!delivered) failedDeliveries++;
+        }
+
+        if (failedDeliveries > 0) {
+            console.error(`Trigger delivery failed for ${failedDeliveries} of ${subscriptions.length} subscription(s).`);
+            res.sendStatus(502);
+        } else {
+            res.sendStatus(200);
+        }
     } catch (err) {
         console.error((err as Error).message);
         res.sendStatus(400);
