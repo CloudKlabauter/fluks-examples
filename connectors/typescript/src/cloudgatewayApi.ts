@@ -5,7 +5,7 @@ import { SubscriptionRegisterReply, SubscriptionUnregisterReply } from "./types/
 import { ITriggerReply } from "./types/triggerTypes";
 
 export const getMessagesAll10Minutes = (callback: (msgs: IMessage[]) => Promise<void> | void) => {
-    setInterval(async () => {
+    const poll = async () => {
         try {
             const messageResponse = await fetch(`${process.env.FLUKS_CLOUD_GATEWAY_URL}/api/messages`, {
                 method: "GET",
@@ -18,15 +18,18 @@ export const getMessagesAll10Minutes = (callback: (msgs: IMessage[]) => Promise<
                 const messageData = (await messageResponse.json()) as IMessageResponse;
                 console.log(messageData);
                 await callback(messageData.messages);
-                return;
+            } else {
+                const { status, statusText } = messageResponse;
+                console.error(`${status}: ${statusText}`);
             }
-
-            const { status, statusText } = messageResponse;
-            console.error(`${status}: ${statusText}`);
         } catch (error) {
             console.error(`Polling messages failed: ${(error as Error).message}`);
+        } finally {
+            setTimeout(poll, 60000 * 10);
         }
-    }, 60000 * 10);
+    };
+
+    setTimeout(poll, 60000 * 10);
 };
 
 export const processMessages = async (msgs: IMessage[]) => {
