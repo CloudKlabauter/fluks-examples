@@ -2,9 +2,9 @@
     "$schema": "https://docs.fluks.cloud/schemas/connector/draft-2/schema.json",
     "Infos": {
         "Version": "0.1.0",
-        "ConnectorName": "Tradesmen Example",
+        "ConnectorName": "Handwerker Beispiel",
         "ConnectorId": "ck.fluks.examples.connectors.tradesmen",
-        "Description": "Example tradesmen service connector"
+        "Description": "Beispiel-Connector für einen Handwerkerdienst"
     },
     "SecurityInfo": {
         "Name": "x-ck-api-token"
@@ -13,8 +13,8 @@
         "OrderCompleted": {
             "Name": "OrderCompleted",
             "ResultModelId": "OrderCompletedResult",
-            "Title": "Order completed",
-            "Description": "An order has been completed",
+            "Title": "Auftrag abgeschlossen",
+            "Description": "Ein Auftrag wurde abgeschlossen",
             "SchemaName": "ck.fluks.examples.connectors.tradesmen.ordercompleted",
             "SchemaVersion": "1",
             "TriggerEvaluationLocation": "Connector",
@@ -23,7 +23,7 @@
                     "ClientId": {
                         "DataType": "string",
                         "Required": false,
-                        "Description": "Client Id"
+                        "Description": "Kunden-ID"
                     }
                 }
             }
@@ -33,21 +33,21 @@
     "Actions": {
         "CreateOrder": {
             "Name": "CreateOrder",
-            "Title": "Create a new order",
-            "Description": "Order request sent to the tradesmen service",
+            "Title": "Neuen Auftrag erstellen",
+            "Description": "Auftragsanfrage an den Handwerkerdienst senden",
             "ActionResultContentDefinitionName": "CreateOrderResponse",
             "SchemaName": "ck.fluks.examples.connectors.tradesmen.createorder",
             "SchemaVersion": "1",
             "Parameters": [
                 {
                     "Name": "OrderText",
-                    "Description": "What needs to be done",
+                    "Description": "Was erledigt werden soll",
                     "Type": "string",
                     "Required": true
                 },
                 {
                     "Name": "ClientAdress",
-                    "Description": "Client adress",
+                    "Description": "Kundenadresse",
                     "Type": "string",
                     "Required": true
                 }
@@ -61,7 +61,7 @@
             "Properties": {
                 "Id": {
                     "DataType": "string",
-                    "Description": "Order Id"
+                    "Description": "Auftrags-ID"
                 }
             }
         },
@@ -70,11 +70,11 @@
             "Properties": {
                 "ClientID": {
                     "DataType": "string",
-                    "Description": "Client Id"
+                    "Description": "Kunden-ID"
                 },
                 "Message": {
                     "DataType": "string",
-                    "Description": "Additional Message"
+                    "Description": "Zusätzliche Nachricht"
                 }
             }
         }
