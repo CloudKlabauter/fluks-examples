@@ -14,7 +14,7 @@ export const processConnectorRegisterSubscriptionRequest = async (msg: IRegister
     try {
         // Here should be your connector subscription logic
         console.log(
-            `Trigger '${msg.trigger}' registered with subcription id '${
+            `Trigger '${msg.trigger}' registered with subscription id '${
                 msg.subscriptionId
             }' with filters '${JSON.stringify(msg.staticFilter)}`
         );
