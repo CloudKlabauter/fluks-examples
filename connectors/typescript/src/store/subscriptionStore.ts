@@ -45,12 +45,30 @@ export const removeSubscription = (subscriptionId: string): void => {
     saveSubscriptions(subscriptionInfos);
 };
 
+const canonicalizeFilter = (value: any): any => {
+    if (value === null || typeof value !== "object") {
+        return value;
+    }
+    if (Array.isArray(value)) {
+        return value.map(canonicalizeFilter);
+    }
+    return Object.keys(value)
+        .sort()
+        .reduce((acc: Record<string, any>, key) => {
+            acc[key] = canonicalizeFilter(value[key]);
+            return acc;
+        }, {});
+};
+
 export const getSubscriptionsForFilter = (
     triggerId: string,
     filter: any
 ): Promise<ISubscriptionInfo[]> => {
     const subscriptionInfos = readSubscriptions();
+    const normalizedFilter = JSON.stringify(canonicalizeFilter(filter));
     return Promise.resolve(
-        subscriptionInfos.filter((s) => s.trigger === triggerId && JSON.stringify(s.filter) === JSON.stringify(filter))
+        subscriptionInfos.filter(
+            (s) => s.trigger === triggerId && JSON.stringify(canonicalizeFilter(s.filter)) === normalizedFilter
+        )
     );
 };
