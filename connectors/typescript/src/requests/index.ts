@@ -25,7 +25,7 @@ export const processRequest = async (msg: IMessage) => {
                 await processConnectorUnregisterSubscriptionRequest(msg as IUnregisterSubscriptionMessage);
                 break;
             default:
-                console.log(`Unkown message type: ${msg.type}`);
+                console.log(`Unknown message type: ${msg.type}`);
                 break;
         }
     } finally {
