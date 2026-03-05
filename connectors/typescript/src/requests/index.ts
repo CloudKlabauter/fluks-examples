@@ -40,6 +40,10 @@ export const processRequest = async (msg: IMessage) => {
         // From this point, completion responsibility is no longer with fluks.
         // If a connector does not acknowledge, fluks will redeliver the exact same message
         // repeatedly to guarantee the message is not lost.
-        await acknolwedgeMessage(msg.messageId);
+        try {
+            await acknolwedgeMessage(msg.messageId);
+        } catch (err) {
+            console.error(`Failed to acknowledge message ${msg.messageId}: ${(err as Error).message}`);
+        }
     }
 };
