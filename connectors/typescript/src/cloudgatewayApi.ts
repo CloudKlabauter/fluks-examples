@@ -1,33 +1,40 @@
 import { processRequest } from "./requests";
-import { IActionReply, IActionFailure, ActionReply } from "./types/actionTypes";
+import { ActionReply } from "./types/actionTypes";
 import { IMessage, IMessageResponse } from "./types/messageTypes";
 import { SubscriptionRegisterReply, SubscriptionUnregisterReply } from "./types/subscriptionTypes";
 import { ITriggerReply } from "./types/triggerTypes";
 
-export const getMessagesAll10Minutes = (callback: (msgs: IMessage[]) => void) => {
-    var intr = setInterval(async () => {
-        const messageResponse = await fetch(`${process.env.FLUKS_CLOUD_GATEWAY_URL}/api/messages`, {
-            method: "GET",
-            headers: {
-                "X-API-Key": process.env.FLUKS_API_KEY!,
-            },
-        });
+export const getMessagesAll10Minutes = (callback: (msgs: IMessage[]) => Promise<void> | void) => {
+    setInterval(async () => {
+        try {
+            const messageResponse = await fetch(`${process.env.FLUKS_CLOUD_GATEWAY_URL}/api/messages`, {
+                method: "GET",
+                headers: {
+                    "X-API-Key": process.env.FLUKS_API_KEY!,
+                },
+            });
 
-        if (messageResponse.ok) {
-            const messageData = (await messageResponse.json()) as IMessageResponse;
-            console.log(messageData);
-            callback(messageData.messages);
-        } else {
+            if (messageResponse.ok) {
+                const messageData = (await messageResponse.json()) as IMessageResponse;
+                console.log(messageData);
+                await callback(messageData.messages);
+                return;
+            }
+
             const { status, statusText } = messageResponse;
-            clearInterval(intr);
-            throw new Error(`${status}: ${statusText}`);
+            console.error(`${status}: ${statusText}`);
+        } catch (error) {
+            console.error(`Polling messages failed: ${(error as Error).message}`);
         }
     }, 60000 * 10);
 };
 
 export const processMessages = async (msgs: IMessage[]) => {
     if (msgs.length === 0) console.log("No messages to process.");
-    msgs.forEach(await processRequest);
+
+    for (const msg of msgs) {
+        await processRequest(msg);
+    }
 };
 
 export const acknolwedgeMessage = async (msgId: string): Promise<boolean> => {

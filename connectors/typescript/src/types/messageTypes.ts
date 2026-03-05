@@ -27,7 +27,7 @@ export interface IRegisterSubscriptionMessage extends ISubscriptionMessageBase {
 
 export interface IUnregisterSubscriptionMessage extends ISubscriptionMessageBase {}
 
-export type IMessage = IActionMessage | IRegisterSubscriptionMessage;
+export type IMessage = IActionMessage | IRegisterSubscriptionMessage | IUnregisterSubscriptionMessage;
 
 export const MESSAGE_TYPES = {
     ActionRequest: "ActionRequest",

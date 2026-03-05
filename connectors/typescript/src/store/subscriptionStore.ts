@@ -1,4 +1,4 @@
-import {IRegisterSubscriptionMessage} from "../types/messageTypes";
+import { IRegisterSubscriptionMessage } from "../types/messageTypes";
 import * as fs from "fs";
 
 const STORE_FILE_NAME = "subscriptions.json";
@@ -10,44 +10,47 @@ interface ISubscriptionInfo {
     tenantId: string;
 }
 
-export const saveSubscription = (subscription: IRegisterSubscriptionMessage) => {
-    const subscriptionInfo = {
+const readSubscriptions = (): ISubscriptionInfo[] => {
+    try {
+        if (!fs.existsSync(STORE_FILE_NAME)) {
+            return [];
+        }
+
+        const data = fs.readFileSync(STORE_FILE_NAME, "utf-8");
+        return JSON.parse(data) as ISubscriptionInfo[];
+    } catch {
+        return [];
+    }
+};
+
+const saveSubscriptions = (subscriptions: ISubscriptionInfo[]): void => {
+    fs.writeFileSync(STORE_FILE_NAME, JSON.stringify(subscriptions));
+};
+
+export const saveSubscription = (subscription: IRegisterSubscriptionMessage): void => {
+    const subscriptionInfo: ISubscriptionInfo = {
         subscriptionId: subscription.subscriptionId,
         trigger: subscription.trigger,
         filter: subscription.staticFilter,
         tenantId: subscription.tenantId,
     };
 
-    let subscriptionInfos: ISubscriptionInfo[] = [];
-    fs.readFile(STORE_FILE_NAME, (err, data) => {
-        if (!err) subscriptionInfos = JSON.parse(data.toString()) as ISubscriptionInfo[];
-
-        subscriptionInfos.push(subscriptionInfo);
-
-        fs.writeFileSync(STORE_FILE_NAME, JSON.stringify(subscriptionInfos));
-    });
+    const subscriptionInfos = readSubscriptions();
+    subscriptionInfos.push(subscriptionInfo);
+    saveSubscriptions(subscriptionInfos);
 };
 
-export const removeSubscription = (subscriptionId: string) => {
-    let subscriptionInfos: ISubscriptionInfo[] = [];
-    fs.readFile(STORE_FILE_NAME, (err, data) => {
-        if (!err) subscriptionInfos = JSON.parse(data.toString()) as ISubscriptionInfo[];
-
-        const newSubscriptionInfos = subscriptionInfos.filter((s) => s.subscriptionId !== subscriptionId);
-
-        fs.writeFileSync(STORE_FILE_NAME, JSON.stringify(newSubscriptionInfos));
-    });
+export const removeSubscription = (subscriptionId: string): void => {
+    const subscriptionInfos = readSubscriptions().filter((s) => s.subscriptionId !== subscriptionId);
+    saveSubscriptions(subscriptionInfos);
 };
 
 export const getSubscriptionsForFilter = (
     triggerId: string,
-    filter: string,
-    callback: (subscriptions: ISubscriptionInfo[]) => void
-) => {
-    let subscriptionInfos: ISubscriptionInfo[] = [];
-
-    fs.readFile(STORE_FILE_NAME, (err, data) => {
-        if (!err) subscriptionInfos = JSON.parse(data.toString()) as ISubscriptionInfo[];
-        callback(subscriptionInfos.filter((s) => s.trigger === triggerId &&  JSON.stringify(s.filter) === JSON.stringify(filter)));
-    });
+    filter: any
+): Promise<ISubscriptionInfo[]> => {
+    const subscriptionInfos = readSubscriptions();
+    return Promise.resolve(
+        subscriptionInfos.filter((s) => s.trigger === triggerId && JSON.stringify(s.filter) === JSON.stringify(filter))
+    );
 };

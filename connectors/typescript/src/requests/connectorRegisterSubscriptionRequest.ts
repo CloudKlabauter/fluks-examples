@@ -1,7 +1,7 @@
-import {acknolwedgeMessage, sendMessageReply} from "../cloudgatewayApi";
-import {saveSubscription} from "../store/subscriptionStore";
-import {IRegisterSubscriptionMessage} from "../types/messageTypes";
-import {IRegisterSubscriptionMessageBase} from "../types/subscriptionTypes";
+import { sendMessageReply } from "../cloudgatewayApi";
+import { saveSubscription } from "../store/subscriptionStore";
+import { IRegisterSubscriptionMessage } from "../types/messageTypes";
+import { IRegisterSubscriptionMessageBase } from "../types/subscriptionTypes";
 
 export const processConnectorRegisterSubscriptionRequest = async (msg: IRegisterSubscriptionMessage) => {
     const subscriptionResponse = {
@@ -19,14 +19,12 @@ export const processConnectorRegisterSubscriptionRequest = async (msg: IRegister
             }' with filters '${JSON.stringify(msg.staticFilter)}`
         );
 
-        const sendActionSuccess = await sendMessageReply({
+        await saveSubscription(msg);
+
+        await sendMessageReply({
             ...subscriptionResponse,
             type: "ConnectorRegisterSubscriptionReply",
         });
-
-        saveSubscription(msg);
-
-        if (sendActionSuccess) await acknolwedgeMessage(msg.messageId);
     } catch (err) {
         await sendMessageReply({
             ...subscriptionResponse,
