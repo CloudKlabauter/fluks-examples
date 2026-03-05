@@ -19,7 +19,7 @@ export const processConnectorRegisterSubscriptionRequest = async (msg: IRegister
             }' with filters '${JSON.stringify(msg.staticFilter)}`
         );
 
-        saveSubscription(msg);
+        await saveSubscription(msg);
 
         return await sendMessageReply({
             ...subscriptionResponse,

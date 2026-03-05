@@ -1,5 +1,5 @@
 import { IRegisterSubscriptionMessage } from "../types/messageTypes";
-import * as fs from "fs";
+import * as fs from "fs/promises";
 
 const STORE_FILE_NAME = "subscriptions.json";
 
@@ -10,13 +10,19 @@ interface ISubscriptionInfo {
     tenantId: string;
 }
 
-const readSubscriptions = (): ISubscriptionInfo[] => {
+const readSubscriptions = async (): Promise<ISubscriptionInfo[]> => {
     try {
-        if (!fs.existsSync(STORE_FILE_NAME)) {
+        await fs.access(STORE_FILE_NAME);
+    } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") {
             return [];
         }
+        console.error(`Failed to access subscription store file "${STORE_FILE_NAME}":`, error);
+        throw error;
+    }
 
-        const data = fs.readFileSync(STORE_FILE_NAME, "utf-8");
+    try {
+        const data = await fs.readFile(STORE_FILE_NAME, "utf-8");
         return JSON.parse(data) as ISubscriptionInfo[];
     } catch (error) {
         console.error(`Failed to read or parse subscription store file "${STORE_FILE_NAME}":`, error);
@@ -24,11 +30,16 @@ const readSubscriptions = (): ISubscriptionInfo[] => {
     }
 };
 
-const saveSubscriptions = (subscriptions: ISubscriptionInfo[]): void => {
-    fs.writeFileSync(STORE_FILE_NAME, JSON.stringify(subscriptions));
+const saveSubscriptions = async (subscriptions: ISubscriptionInfo[]): Promise<void> => {
+    try {
+        await fs.writeFile(STORE_FILE_NAME, JSON.stringify(subscriptions));
+    } catch (error) {
+        console.error(`Failed to write subscription store file "${STORE_FILE_NAME}":`, error);
+        throw error;
+    }
 };
 
-export const saveSubscription = (subscription: IRegisterSubscriptionMessage): void => {
+export const saveSubscription = async (subscription: IRegisterSubscriptionMessage): Promise<void> => {
     const subscriptionInfo: ISubscriptionInfo = {
         subscriptionId: subscription.subscriptionId,
         trigger: subscription.trigger,
@@ -36,14 +47,14 @@ export const saveSubscription = (subscription: IRegisterSubscriptionMessage): vo
         tenantId: subscription.tenantId,
     };
 
-    const subscriptionInfos = readSubscriptions();
+    const subscriptionInfos = await readSubscriptions();
     subscriptionInfos.push(subscriptionInfo);
-    saveSubscriptions(subscriptionInfos);
+    await saveSubscriptions(subscriptionInfos);
 };
 
-export const removeSubscription = (subscriptionId: string): void => {
-    const subscriptionInfos = readSubscriptions().filter((s) => s.subscriptionId !== subscriptionId);
-    saveSubscriptions(subscriptionInfos);
+export const removeSubscription = async (subscriptionId: string): Promise<void> => {
+    const subscriptionInfos = (await readSubscriptions()).filter((s) => s.subscriptionId !== subscriptionId);
+    await saveSubscriptions(subscriptionInfos);
 };
 
 const canonicalizeFilter = (value: any): any => {
@@ -61,15 +72,13 @@ const canonicalizeFilter = (value: any): any => {
         }, {});
 };
 
-export const getSubscriptionsForFilter = (
+export const getSubscriptionsForFilter = async (
     triggerId: string,
     filter: any
 ): Promise<ISubscriptionInfo[]> => {
-    const subscriptionInfos = readSubscriptions();
+    const subscriptionInfos = await readSubscriptions();
     const normalizedFilter = JSON.stringify(canonicalizeFilter(filter));
-    return Promise.resolve(
-        subscriptionInfos.filter(
-            (s) => s.trigger === triggerId && JSON.stringify(canonicalizeFilter(s.filter)) === normalizedFilter
-        )
+    return subscriptionInfos.filter(
+        (s) => s.trigger === triggerId && JSON.stringify(canonicalizeFilter(s.filter)) === normalizedFilter
     );
 };
