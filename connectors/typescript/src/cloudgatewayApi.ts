@@ -29,7 +29,7 @@ export const getMessagesAll10Minutes = (callback: (msgs: IMessage[]) => Promise<
         }
     };
 
-    setTimeout(poll, 60000 * 10);
+    void poll();
 };
 
 export const processMessages = async (msgs: IMessage[]) => {
