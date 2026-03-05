@@ -7,7 +7,7 @@ export const BINARY_ROUNDTRIP_ACTION_NAME = "BinaryStoreRoundtrip";
 export const processBinaryStoreActionRequest = async (
     msg: IActionMessage,
     actionResponse: IActionReplyBase
-): Promise<void> => {
+): Promise<boolean> => {
     const payload = (msg.payload ?? {}) as { Content?: string; FileName?: string };
     const content = payload.Content ?? "Hallo aus dem Binary-Store-Beispiel.";
     const fileName = payload.FileName ?? "beispiel.txt";
@@ -15,7 +15,7 @@ export const processBinaryStoreActionRequest = async (
     const upload = await uploadTextBinary(msg.tenantId, fileName, content);
     const downloadedContent = await downloadTextBinary(upload.downloadPermitToken);
 
-    await sendMessageReply({
+    return await sendMessageReply({
         ...actionResponse,
         type: "ActionReply",
         payload: {
