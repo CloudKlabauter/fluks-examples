@@ -105,3 +105,52 @@ export const sendTriggerExecution = async (respMsg: ITriggerReply): Promise<bool
 
     return triggerReplyResponse.ok;
 };
+
+export const uploadTextBinary = async (
+    tenantId: string,
+    fileName: string,
+    text: string
+): Promise<{ downloadPermitToken: string; binaryId: string }> => {
+    const formData = new FormData();
+    formData.append("streamPart", new Blob([text], { type: "text/plain; charset=utf-8" }), fileName);
+
+    const response = await fetch(`${process.env.FLUKS_CLOUD_GATEWAY_URL}/api/binaries?tenantId=${encodeURIComponent(tenantId)}`, {
+        method: "POST",
+        headers: {
+            "X-API-Key": process.env.FLUKS_API_KEY!,
+        },
+        body: formData,
+    });
+
+    if (!response.ok) {
+        throw new Error(`Upload binary failed: ${response.status} ${response.statusText}`);
+    }
+
+    const body = (await response.json()) as Partial<{ downloadPermitToken: string; binaryId: string }>;
+    if (!body.downloadPermitToken || !body.binaryId) {
+        throw new Error("Upload binary response is missing required fields.");
+    }
+
+    return {
+        downloadPermitToken: body.downloadPermitToken,
+        binaryId: body.binaryId,
+    };
+};
+
+export const downloadTextBinary = async (permitToken: string): Promise<string> => {
+    const response = await fetch(
+        `${process.env.FLUKS_CLOUD_GATEWAY_URL}/api/binaries?permitToken=${encodeURIComponent(permitToken)}`,
+        {
+            method: "GET",
+            headers: {
+                "X-API-Key": process.env.FLUKS_API_KEY!,
+            },
+        }
+    );
+
+    if (!response.ok) {
+        throw new Error(`Download binary failed: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.text();
+};

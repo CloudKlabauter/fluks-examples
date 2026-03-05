@@ -52,6 +52,28 @@
                     "Required": true
                 }
             ]
+        },
+        "BinaryStoreRoundtrip": {
+            "Name": "BinaryStoreRoundtrip",
+            "Title": "Binary-Store Upload/Download",
+            "Description": "Lädt eine Textdatei in den Binary-Store hoch und lädt sie direkt wieder herunter",
+            "ActionResultContentDefinitionName": "BinaryRoundtripResponse",
+            "SchemaName": "ck.fluks.examples.connectors.tradesmen.binarystore.roundtrip",
+            "SchemaVersion": "1",
+            "Parameters": [
+                {
+                    "Name": "Content",
+                    "Description": "Textinhalt der hochgeladenen Datei",
+                    "Type": "string",
+                    "Required": false
+                },
+                {
+                    "Name": "FileName",
+                    "Description": "Dateiname der hochgeladenen Datei",
+                    "Type": "string",
+                    "Required": false
+                }
+            ]
         }
     },
     "Credentials": {},
@@ -62,6 +84,23 @@
                 "Id": {
                     "DataType": "string",
                     "Description": "Auftrags-ID"
+                }
+            }
+        },
+        "BinaryRoundtripResponse": {
+            "DataType": "object",
+            "Properties": {
+                "BinaryId": {
+                    "DataType": "string",
+                    "Description": "ID der hochgeladenen Binärdatei"
+                },
+                "DownloadPermitToken": {
+                    "DataType": "string",
+                    "Description": "Token zum Herunterladen der Binärdatei"
+                },
+                "ContentMatches": {
+                    "DataType": "boolean",
+                    "Description": "Gibt an, ob heruntergeladener und hochgeladener Inhalt übereinstimmen"
                 }
             }
         },

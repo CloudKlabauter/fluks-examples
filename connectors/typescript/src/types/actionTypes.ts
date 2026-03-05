@@ -3,6 +3,7 @@ export interface IActionReplyBase {
     tenantId: string;
     action: string;
     conversationId: string;
+    binaryIds?: string[];
 }
 
 export interface IActionReply extends IActionReplyBase {
