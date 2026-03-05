@@ -18,8 +18,9 @@ const readSubscriptions = (): ISubscriptionInfo[] => {
 
         const data = fs.readFileSync(STORE_FILE_NAME, "utf-8");
         return JSON.parse(data) as ISubscriptionInfo[];
-    } catch {
-        return [];
+    } catch (error) {
+        console.error(`Failed to read or parse subscription store file "${STORE_FILE_NAME}":`, error);
+        throw error;
     }
 };
 
