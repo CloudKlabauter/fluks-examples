@@ -3,7 +3,7 @@ import { removeSubscription } from "../store/subscriptionStore";
 import { IUnregisterSubscriptionMessage } from "../types/messageTypes";
 import { IUnregisterSubscriptionMessageBase } from "../types/subscriptionTypes";
 
-export const processConnectorUnregisterSubscriptionRequest = async (msg: IUnregisterSubscriptionMessage) => {
+export const processConnectorUnregisterSubscriptionRequest = async (msg: IUnregisterSubscriptionMessage): Promise<boolean> => {
     const subscriptionResponse = {
         conversationId: msg.conversationId,
         tenantId: msg.tenantId,
@@ -16,12 +16,12 @@ export const processConnectorUnregisterSubscriptionRequest = async (msg: IUnregi
 
         removeSubscription(msg.subscriptionId);
 
-        await sendMessageReply({
+        return await sendMessageReply({
             ...subscriptionResponse,
             type: "ConnectorUnregisterSubscriptionReply",
         });
     } catch (err) {
-        await sendMessageReply({
+        return await sendMessageReply({
             ...subscriptionResponse,
             type: "ConnectorUnregisterSubscriptionFailure",
             failureReason: (err as Error).message,
